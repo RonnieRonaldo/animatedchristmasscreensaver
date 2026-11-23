@@ -1,0 +1,14 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import worker from '../public/_worker.js';
+const origin='https://animatedchristmasscreensaver.com';
+const env={CHECKOUT_ENABLED:'true',PADDLE_API_KEY:'test-key',PADDLE_PRICE_ID:'pri_test',PADDLE_CLIENT_TOKEN:'test-token',ACCESS_SECRET:'a'.repeat(64),PRODUCT:{get:async()=>({body:'private content',writeHttpMetadata(){}})},ASSETS:{fetch:()=>new Response('public')}};
+const post=(path,body,cookie='')=>new Request(origin+path,{method:'POST',headers:{Origin:origin,Cookie:cookie,'Content-Type':'application/json'},body:JSON.stringify(body)});
+test('checkout disabled until all required configuration exists',async()=>{const r=await worker.fetch(new Request(origin+'/api/config'),{});assert.equal((await r.json()).checkoutReady,false)});
+test('private files redirect without access; cookie tampering rejected',async()=>{for(const c of ['', 'christmas_access=fake.forged']){const r=await worker.fetch(new Request(origin+'/experience/scenes/list-unroll-prepared/scene.js',{headers:{Cookie:c}}),env);assert.equal(r.status,303)}});
+test('checkout rejects foreign origin before Paddle is called',async()=>{const r=await worker.fetch(new Request(origin+'/api/checkout',{method:'POST',headers:{Origin:'https://other.example'}}),env);assert.equal(r.status,403)});
+test('paid transaction must match browser nonce and product',async()=>{const previous=globalThis.fetch;let nonce;const transaction='txn_'+'a'.repeat(26);let status='completed',price='pri_test',badNonce=false;
+ globalThis.fetch=async(url,init)=>{if(init.method==='POST'){nonce=JSON.parse(init.body).custom_data.purchase_nonce;return Response.json({data:{id:transaction}})}return Response.json({data:{id:transaction,status,custom_data:{purchase_nonce:badNonce?'wrong':nonce},items:[{price:{id:price}}]}})};
+ try{const checkout=await worker.fetch(post('/api/checkout',{}),env);assert.equal(checkout.status,200);const purchaseCookie=checkout.headers.get('Set-Cookie').split(';')[0];
+ for(const variant of ['pending','price','nonce']){status=variant==='pending'?'paid':'completed';price=variant==='price'?'pri_wrong':'pri_test';badNonce=variant==='nonce';const r=await worker.fetch(post('/api/claim',{transactionId:transaction},purchaseCookie),env);assert.equal(r.status,variant==='pending'?409:403)}
+ status='completed';price='pri_test';badNonce=false;const success=await worker.fetch(post('/api/claim',{transactionId:transaction},purchaseCookie),env);assert.equal(success.status,200);const access=success.headers.get('Set-Cookie');assert.match(access,/HttpOnly; Secure; SameSite=Lax/);const privatePage=await worker.fetch(new Request(origin+'/experience/',{headers:{Cookie:access.split(';')[0]}}),env);assert.equal(await privatePage.text(),'private content');assert.equal(privatePage.headers.get('Cache-Control'),'private, no-store');
+ }finally{globalThis.fetch=previous}
+});

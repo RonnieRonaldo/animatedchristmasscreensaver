@@ -1,0 +1,6 @@
+name = "animatedchristmasscreensaver"
+compatibility_date = "2026-11-23"
+pages_build_output_dir = "public"
+
+# Add the private PRODUCT R2 binding in the Cloudflare Pages dashboard.
+# Configure payment variables there; never commit API keys or ACCESS_SECRET.
