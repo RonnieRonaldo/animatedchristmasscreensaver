@@ -5,3 +5,6 @@ pages_build_output_dir = "public"
 [[r2_buckets]]
 binding = "PRODUCT"
 bucket_name = "christmas-screensaver-product"
+
+[vars]
+GA_MEASUREMENT_ID = "G-VMCN3NX5EW"
