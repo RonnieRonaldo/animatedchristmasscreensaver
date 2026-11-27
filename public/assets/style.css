@@ -12,3 +12,8 @@
 .hero h1{font-family:"Great Vibes",Georgia,serif;font-size:clamp(42px,6vw,76px);line-height:1.25;font-weight:400;padding-inline:8px}
 .intro em{font-family:Georgia,"Times New Roman",serif;font-style:italic}
 .intro .magic-intro{display:block;font-family:"Great Vibes",Georgia,serif;font-size:clamp(32px,4vw,46px);line-height:1.4;font-weight:400;margin-top:6px;padding-inline:6px;text-wrap:balance}
+
+/* Compact opening and purchase reassurance */
+.header{height:78px}.hero{padding-top:18px}.hero h1{margin-bottom:16px}
+.guarantee{display:flex;align-items:center;justify-content:center;gap:10px;width:fit-content;max-width:100%;margin:16px auto 0;padding:12px 18px;border:1px solid #c7a16b;border-radius:9px;background:#fff7e8;color:var(--ink);text-align:left;text-decoration:none;position:relative}.guarantee svg{width:26px;height:31px;fill:none;stroke:#aa7b30;stroke-width:1.7;flex-shrink:0}.guarantee strong{font:700 16px Georgia,serif}.guarantee small{display:block;font:13px/1.5 Arial,sans-serif;color:#625643;margin-top:4px}.guarantee:hover{border-color:var(--red)}.youtube-link{text-align:center;font-size:14px;margin:22px 0 0;color:var(--muted)}.youtube-link a{text-underline-offset:4px}footer div{flex-wrap:wrap;justify-content:center}
+@media(max-width:640px){.header{height:68px}.hero{padding-top:16px}.hero h1{margin-bottom:12px}.guarantee{padding:11px 12px}.guarantee strong{font-size:15px}}
